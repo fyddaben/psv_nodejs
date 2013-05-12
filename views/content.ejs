@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>psv小清新_内容页</title>
+	<link rel="stylesheet"  href="/stylesheets/jquery.mobile-1.3.0.css">
+	<link rel="stylesheet" href="/stylesheets/jqm-demos.css">
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:300,400,700">
+	<link rel="stylesheet" href="/stylesheets/grid-listview.css">
+	<script src="/javascripts/jquery.js"></script>
+	<script src="/javascripts/jqm-demos.js"></script>
+	<script src="/javascripts/jquery.mobile-1.3.0.js"></script>
+   
+  </head>
+  <body>
+   
+<div data-role="page" id="demo-page" data-theme="d" >
+
+    <div data-role="header" data-theme="c" data-position="fixed">
+        <h1>$<%=psvg.psvg_dollar%></h1>
+        <a href="#popupMenu"  data-rel="popup" data-icon="bars" data-iconpos="notext" data-shadow="false" data-iconshadow="false">Menu</a>
+        <div data-role="popup" id="popupMenu" data-theme="d">
+            <ul data-role="listview" data-inset="true" data-theme="d" id="backlist">
+               <%if(psvg.username==''){%>
+                <li><a href="#popupLogin"  data-rel="popup" data-position-to="window">登陆</a></li>
+                <li><a href="/reg"  data-ajax="false" >注册</a></li>
+                <%}else{%>
+                <li><%=psvg.username%>
+                  <input type="hidden" id="username" value="<%=psvg.username%>"/>
+                 </li>
+                <li><a href="#" id="logout">注销</a></li>
+                <%}%>
+                <li  data-icon="back"><a href="/"  data-ajax="false" >返回</a></li>
+                
+            </ul>
+        </div>
+         <a href="#popupDialog" data-position-to="window" data-transition="slideup" data-rel="popup" data-icon="edit" data-iconpos="notext" data-shadow="false" data-iconshadow="false">Menu</a>
+         <div data-role="popup" id="popupDialog" data-overlay-theme="a" data-theme="c"  style="max-width:400px;" class="ui-corner-all">
+            <div data-role="header" data-theme="a" class="ui-corner-top">
+                <h1>发布评论</h1>
+            </div>
+            <div data-role="content" data-theme="d" class="ui-corner-bottom ui-content" style="text-align:right">
+                <textarea cols="40" rows="8" name="textarea" id="textarea_talk"></textarea>
+                 <input type="button" id="fabu" value="发布"  data-theme="a" data-mini="true" data-inline="true">
+                 
+            </div>
+         </div>
+         <script>
+           
+               $( "#fabu" ).click(function(){
+                  var username=$("#username").val();
+                  
+                  if(username!=''&&username!=undefined){
+                        var a=$("#textarea_talk").val();
+                        if(a==''){
+                          return false;
+                        }
+                        var id=$("#psvg_id").val();
+                        $.post("/common",{content:a,psvg_id:id},function(data){
+                           console.log(data);
+                           //先不做分页
+                           var code=data.rescode;
+                           if(code=='200'){
+                               var list=data;
+                               var Str='';
+                               var length=0;
+                               if(list.result!=null&&list.result.length>0){
+                                      length=list.result.length;
+                                      for(var i=0;i<list.result.length;i++){
+                                          
+                                          var obj=list.result[i];
+                                          Str=Str+" <li data-theme=\"a\">"+
+                                                  "<h2>"+obj.username+"</h2>"+
+                                                  
+                                                  "<p>"+obj.content+"</p>"+
+                                                  "<p class=\"ui-li-aside\"><strong>"+obj.createTime+"</strong></p>"+
+                                                  "</li>";
+
+                                      }
+                               }
+                               var ping_head="<li data-role=\"list-divider\">评论内容 <span class=\"ui-li-count\">"+length+"</span></li>";
+                              $("#talk_list").html(ping_head+Str);
+                              $( "#talk_list" ).listview( "refresh" );
+                              $( "#popupDialog" ).popup( "close" );
+                           }
+
+
+                        });
+
+                  }else{
+                       
+                       $("#popupDialog h1").html('<font color=\"#B619DD\">木有登陆</font>');
+                  }
+                  /*
+                  */
+               });
+               
+         </script>
+    </div><!-- /header -->
+
+    <div data-role="content">
+
+        <div class="article">
+            <p>
+         <a href="#popupParis" data-rel="popup" data-position-to="window" data-transition="fade"><img class="popphoto" src="/upload/<%=psvg.psvg_Bimg%>" alt="<%=psvg.psvg_name%>" ></a>
+                <!--<img src="/images/5fbf267b38ccff680bd187ef.jpg" alt="Fixed Gear bike">-->
+            <div data-role="popup" id="popupParis" data-overlay-theme="a" data-theme="d" data-corners="false">
+                <a href="#" data-rel="back" data-role="button" data-theme="a" data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a><img class="popphoto" src="/upload/<%=psvg.psvg_Bimg%>" style="max-height:512px;" alt="<%=psvg.psvg_name%>">
+            </div>
+            </p>
+
+            <h2><%=psvg.psvg_name%><input type="hidden" id="psvg_id" value="<%=psvg.psvg_id%>"/></h2>
+
+            <p><%=psvg.psvg_SimplCon%></p>
+
+            <p><small>Source: <%=psvg.psvg_source%></small></p>
+
+            <p><a href="#right-panel" data-role="button" data-theme="b" data-inline="true" data-mini="true" data-shadow="false">Share</a></p>
+
+        </div><!-- /article -->
+        <ul data-role="listview" data-inset="true" id="talk_list">
+            <li data-role="list-divider">评论内容 <span class="ui-li-count">2</span></li>
+            <li  data-theme="a" >
+              <a href="#Stephen" data-rel="popup">
+                <h2>Stephen Weber</h2>
+                <p>Hey Stephen, if you're available at 10am tomorrow, we've got a meeting with the jQuery team.</p>
+                <p class="ui-li-aside"><strong>6:24</strong>PM</p>
+              </a>
+             
+            </li>
+          
+        </ul>
+         <div data-role="popup" id="Stephen" data-overlay-theme="a" data-theme="c"  style="max-width:400px;" class="ui-corner-all">
+                <div data-role="header" data-theme="a" class="ui-corner-top">
+                    <h1>Stephen Weber</h1>
+                </div>
+                <div data-role="content" data-theme="d" class="ui-corner-bottom ui-content" style="text-align:center">
+                    <p>Hey Stephen, if you're available at 10am tomorrow, we've got a meeting with the jQuery team.
+                    </p>              
+                 </div>
+        </div>
+        <!--注册-->
+
+           
+                <div data-role="popup" id="popupLogin" data-theme="a" class="ui-corner-all">
+                    
+                        <div style="padding:10px 20px;">
+                          <h3>Please sign in</h3>
+                          <label for="un" class="ui-hidden-accessible">Username:</label>
+                          <input type="text" name="user" id="un" value="" placeholder="username" data-theme="a">
+                          <label for="pw" class="ui-hidden-accessible">Password:</label>
+                          <input type="password" name="pass" id="pw" value="" placeholder="password" data-theme="a">
+                          <button id='submit' type="button" data-theme="b" data-icon="check">Sign in</button>
+                        </div>
+                    
+                </div>
+            <script type="text/javascript">
+                $(function(){
+                    function loginDis(){
+                        $("#popupLogin").popup("close");
+                    }
+
+                    function logout(){
+                        $.post("/logout",function(data){
+                            var code=data.rescode;
+                            if(code=='200'){
+                                 var str="<li><a href=\"#popupLogin\"  data-rel=\"popup\" data-position-to=\"window\">登陆</a></li><li><a href=\"/reg\"  data-ajax=\"false\">注册</a></li><li  data-icon=\"back\"><a href=\"/\"  data-ajax=\"false\">返回</a></li>";
+                                   $("#backlist").html(str);
+                                   $( "#backlist" ).listview( "refresh" );
+                            }
+                        });
+                    }
+                    $("#logout").click(function(){
+                        logout();
+                    });
+                    $("#submit").click(function(){
+                         var username=$("#un").val();
+                         var pwd=$("#pw").val();
+                         if(username!=''&&pwd!=''){
+                            $.post("/login",{username:username,password:pwd},function(data){
+                                var code=data.rescode;
+                                if(code=='200'){
+                                   $("#popupLogin h3").html("<font color='green'>OK</font>"); 
+                                   var str="<li>"+username+"<input type=\"hidden\" id=\"username\" value=\""+username+"\"/></li> <li><a href=\"#\" id=\"logout\">注销</a></li><li  data-icon=\"back\"><a href=\"/\"  data-ajax=\"false\">返回</a></li>";
+                                   $("#backlist").html(str);
+                                   $( "#backlist" ).listview( "refresh" );
+                                   $("#logout").click(function(){
+                                      logout();
+                                   });
+                                   setTimeout(loginDis,2000);
+                                }else{
+                                   $("#popupLogin h3").html("<font color='#B619DD'>Error</font>");   
+                                }
+                            });
+                            
+                          //  console.log(username); 
+                         }else{
+                            $("#popupLogin h3").html("<font color='#B619DD'>Error</font>");    
+                            return false;
+                            
+                         }
+
+                         //  
+
+                       
+                    });
+                });
+            </script>
+    </div><!-- /content -->
+
+   
+
+    
+ <style type="text/css">
+       
+/* Styling of the page contents */
+        .article p {
+            margin: 0 0 1em;
+            line-height: 1.5;
+        }
+       .article p img {
+            max-width: 100%;
+        }
+        .article p:first-child {
+            text-align: center;
+        }
+        .article small {
+            display: block;
+            font-size: 75%;
+            color: #c0c0c0;
+        }
+        .article p:last-child {
+            text-align: right;
+        }
+        .article a.ui-btn {
+            margin-right: 2em;
+            -webkit-border-radius: .4em;
+            border-radius: .4em;
+        }
+        @media all and (min-width:769px) {
+            .article {
+                max-width: 994px;
+                margin: 0 auto;
+                padding-top: 4em;
+                -webkit-column-count: 2;
+                -moz-column-count: 2;
+                column-count: 2;
+                -webkit-column-gap: 2em;
+                -moz-column-gap: 2em;
+                column-gap: 2em;
+            }
+            /* Fix for issue with buttons and form elements
+            if CSS columns are used on a page with a panel. */
+            .article a.ui-btn {
+                -webkit-transform: translate3d(0,0,0);
+            }
+        }
+    </style>
+</div><!-- /page -->
+<script type="text/javascript">
+   $(function(){
+     var id=$("#psvg_id").val();
+      $.mobile.showPageLoadingMsg( "a", "", false );
+     $.get("/common",{psvg_id:id},function(data){
+            var code=data.rescode;
+                   if(code=='200'){
+                      var list=data;
+                      var Str='';
+                      var length=0;
+                      if(list.result!=null&&list.result.length>0){
+                         length=list.result.length;
+                         for(var i=0;i<list.result.length;i++){
+                                                    
+                           var obj=list.result[i];
+                             Str=Str+" <li data-theme=\"a\">"+
+                            "<h2>"+obj.username+"</h2>"+
+                                                            
+                            "<p>"+obj.content+"</p>"+
+                            "<p class=\"ui-li-aside\"><strong>"+obj.createTime+"</strong></p>"+
+                            "</li>";
+                              }
+                       }
+           var ping_head="<li data-role=\"list-divider\">评论内容 <span class=\"ui-li-count\">"+length+"</span></li>";
+          $("#talk_list").html(ping_head+Str);
+
+         
+          $( "#talk_list" ).listview( "refresh" );
+           $.mobile.hidePageLoadingMsg();
+            }
+     });
+
+       
+   });
+</script>
+  </body>
+</html>

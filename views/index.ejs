@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>psv小清新</title>
+	<link rel="stylesheet"  href="/stylesheets/jquery.mobile-1.3.0.css">
+	<link rel="stylesheet" href="/stylesheets/jqm-demos.css">
+  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:300,400,700">
+	<link rel="stylesheet" href="/stylesheets/grid-listview.css">
+	<script src="/javascripts/jquery.js"></script>
+	<script src="/javascripts/jqm-demos.js"></script>
+	<script src="/javascripts/jquery.mobile-1.3.0.js"></script>
+  </head>
+  <body>
+    <div data-role="page" data-theme="a" id="demo-page" class="my-page">
+
+	<div data-role="header">
+		<h1>PSV HOT</h1>
+		
+	</div><!-- /header -->
+	
+	<div data-role="content">
+	
+        <ul data-role="listview" data-inset="true" id="list">
+          
+        </ul>
+                
+    </div><!-- /content -->
+    
+    <div data-role="footer" data-theme="none" id="footer">
+        <h3>
+           <input type="button" value="更多...." id="more">
+        </h3>
+    </div><!-- /footer -->
+  <input type="hidden" id="nextFlag" value="true"/>
+  <input type="hidden" id="ipage" value="0"/>
+</div><!-- /page -->
+
+<script>
+  
+
+
+   $(function(){
+           $.mobile.showPageLoadingMsg( "a", "", false );
+           loadData();
+
+           function loadData(){
+                     var nextFlag=$("#nextFlag").val();
+                     var ipage=$("#ipage").val();
+                     
+                     var rowCount=8;
+                     if(nextFlag=='true'){
+                      ipage=parseInt(ipage)+1;
+                         $.get("/back/psv/list?flag=ajax",{ipage:ipage,rowCount:rowCount},function(data){
+                                  
+                                  var rescode=data.rescode;
+                                  if(rescode=='200'){
+                                       $("#nextFlag").val(data.nextFlag);
+                                       $("#ipage").val(data.ipage);
+                                       var len=data.result.length;
+                                       var conStr='';
+                                       for(var i=0;i<len;i++){
+                                           var lii=data.result;
+                                          conStr=conStr+"<li><a href=\"/psv/"+lii[i].psvg_id+"\"  data-ajax=\"false\" >"+
+                                                  "<img src=\"/upload/"+lii[i].psvg_Simg+"\">"+
+                                                  "<h2>"+lii[i].psvg_name+"</h2>"+
+                                                    "<p>"+lii[i].psvg_SimplCon.substring(0,25)+"</p>"+
+                                                    "<p class=\"ui-li-aside\">"+lii[i].psvg_dollar+"</p>"+
+                                                "</a></li>";
+                                       }
+                                       $("#list").append(conStr);
+                                       $( "#list" ).listview( "refresh" );
+                                    
+                                      
+                            }else{
+                                    console.log("请求异常");
+                                  }
+                                   $.mobile.hidePageLoadingMsg();
+                         });//继续加载
+                       }else{
+                         $("#footer").html('<h2><center>@daben1990<center><h2>');
+
+                     }
+
+           }
+
+           
+           
+             if(navigator.platform.indexOf('Win32')!=-1){ 
+                
+                $("#more").click(function(){
+                     var nextFlag=$("#nextFlag").val();
+                     if(nextFlag=='true'){
+                       $.mobile.showPageLoadingMsg( "a", "", false );
+                       loadData(); 
+                     }else{
+ $("#footer").html('<h2><center>@daben1990<center><h2>');                        
+                     }
+                       
+                 });
+             }else{ 
+                $("#footer").html('<h2><center>@daben1990<center><h2>');
+                window.onscroll=function(){
+                   if(Math.abs(document.body.clientHeight - document.documentElement.clientHeight) <= (document.documentElement.scrollTop || document.body.scrollTop)/3*2){
+                       var nextFlag=$("#nextFlag").val();
+                       if(nextFlag=='true'){
+                         $.mobile.showPageLoadingMsg( "a", "", false );
+                         loadData();
+                       }
+                          
+                   }
+                }
+              } 
+
+   });
+  </script>
+  </body>
+</html>
